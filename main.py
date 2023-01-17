@@ -24,7 +24,19 @@ from scipy.io import wavfile
 from scipy.signal import butter, filtfilt
 from PIL import Image
 
-samplerate, data = GetFile()
+sound = AudioSegment.from_mp3('voyager.mp3')
+left = sound.split_to_mono()[0]
+bit_depth = left.sample_width * 8
+array_type = get_array_type(bit_depth)
+numeric_array = array.array(array_type, left._data)
+from pydub.utils import mediainfo
+info = mediainfo('voyager.mp3')
+print(info['sample_rate'])
+samplerate = int(info['sample_rate'])
+print(samplerate)
+
+data = numeric_array
+#samplerate, data = GetFile()
 print("try 5 windows with for and global adjust")
 from scipy.signal import butter, filtfilt
 image_data = []
@@ -45,7 +57,7 @@ for index in range(180):
 
     for j in range(5):
         window = data[offset+j*window_size+buufer + adjust :offset+(j+1)*window_size+buufer + adjust]
-        print(len(window))
+        #print(len(window))
         x = filtfilt(b, a, window)
         w = np.clip(x,-2500,2500)
         image_data.append(-1*w[0:len(w)])
